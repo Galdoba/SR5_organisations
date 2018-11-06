@@ -120,3 +120,5 @@ func toFixed(num float64, precision int) float64 {
 func randInt(min int, max int) int {
 	return min + rand.Intn(max)
 }
+
+
