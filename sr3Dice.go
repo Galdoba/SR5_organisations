@@ -4,11 +4,7 @@ import (
 	"fmt"
 )
 
-func sr3SimpleTest(dp int, tn int) (int, string, []int, string) {
-	var resultArray []int
-	var hits int
-	var gl string
-	var outcome string
+func sr3SimpleTest(dp int, tn int) (hits int, outcome string, resultArray []int, gl string) {
 	for i := 0; i < dp; i++ {
 		resultArray = append(resultArray, rollSR3dice())
 	}
@@ -30,6 +26,26 @@ func sr3SimpleTest(dp int, tn int) (int, string, []int, string) {
 		outcome = "Failure"
 	}
 	return hits, outcome, resultArray, gl
+}
+
+func analyzeSR3SimpleTest(dp int, tn int) (averageHits float64, sucChance float64, glChance float64) {
+	var totalHits float64
+	var totalSuc float64
+	var totalGl float64
+	for i := 0; i < 10000000; i++ {
+		hits, outcome, _, gl := sr3SimpleTest(dp, tn)
+		totalHits = totalHits + float64(hits)
+		if outcome == "Success" {
+			totalSuc++
+		}
+		if gl != "" {
+			totalGl++
+		}
+	}
+	averageHits = totalHits / 10000
+	sucChance = totalSuc / 100
+	glChance = totalGl / 100
+	return averageHits, sucChance, glChance
 }
 
 func roll1D6() int {
