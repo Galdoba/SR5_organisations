@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 func sr3SimpleTest(dp int, tn int) (hits int, outcome string, resultArray []int, gl string) {
 	for i := 0; i < dp; i++ {
 		resultArray = append(resultArray, rollSR3dice())
@@ -63,11 +59,4 @@ func rollSR3dice() int {
 		}
 	}
 	return result
-}
-
-func ping(x ...interface{}) {
-	ping := false
-	if ping {
-		fmt.Println(x)
-	}
 }

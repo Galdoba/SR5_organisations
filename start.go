@@ -13,7 +13,9 @@ import (
 )
 
 var llog = zlog.Instance("main")
-var Syndicates map[string]*Syndicate
+
+//AllSyndicates - сборник всех синдикатов(временно)
+var AllSyndicates = make(map[string]*Syndicate)
 
 func main() {
 	wr := cType{}
@@ -60,15 +62,20 @@ func main() {
 	fmt.Println("Intel")
 	fmt.Println(sr3SimpleTest(6, 5))
 
-	sin := NewSyndicate("Mafia")
-	Syndicates["Mafia"] = sin
-	fmt.Println("-----------")
-	fmt.Println("FullReport:")
+	AllSyndicates = make(map[string]*Syndicate)
+
+	AllSyndicates["Mafia"] = NewSyndicate("Mafia")
+	AllSyndicates["Yakuza"] = NewSyndicate("Yakuza")
+	AllSyndicates["Triada"] = NewSyndicate("Triada")
+
 	for i := 0; i < 3; i++ {
-		for synName, sin := range Syndicates {
-			fmt.Println("Go:", synName)
+		fmt.Println(" ")
+		fmt.Println("Cycle", i)
+		for synName, sin := range AllSyndicates {
+			fmt.Println(" Go:", synName)
+			fmt.Println(" -----------")
+			sin.naturalCycle()
 			fmt.Println(sin.FullReport())
-			sin.NaturalCycle()
 		}
 	}
 

@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type AllSybdicates map[string]*Syndicate
+//type AllSyndicates map[string]*Syndicate
 
 //Syndicate - представляет собой ОРГАНИЗАЦИЮ среднего порядка с экономикой построенной на криминале. имеет 2 типа параметров Operation и Market
 type Syndicate struct {
@@ -66,7 +66,6 @@ func NewSyndicate(name string) *Syndicate {
 		s.Operation[operations[i]] = randInt(1, 10)
 	}
 	s.Adjustment = make(map[string]int)
-	Syndicates["Mafia"] = &s
 	return &s
 }
 
@@ -104,6 +103,7 @@ func (s *Syndicate) SetRating(ratingName string, newRating int) error {
 	return nil
 }
 
+//AdjustedRating -
 func (s *Syndicate) AdjustedRating(ratingName string) (int, error) {
 	rating, ratError := s.Rating(ratingName)
 	if ratError != nil {
@@ -132,7 +132,7 @@ func (s *Syndicate) reportRating(ratingName string) (string, error) {
 //FullReport - Возвращает форматированную стену текста с описанием всех характеристик.
 func (s *Syndicate) FullReport() string {
 	netRating := 0
-	report := "Syndicate Report:" + "\n"
+	report := "Syndicate Report: " + s.Name + "\n"
 	report = report + "Markets" + "\n"
 
 	markets := allMarkets()
@@ -173,6 +173,10 @@ func (s *Syndicate) efficiencyTest() {
 		if hits < 1 {
 			continue
 		}
+		if marketRating > 9 {
+			fmt.Println("                      CAN'T INCREACE BEOYND 10", marketName)
+			continue
+		}
 		s.SetRating(marketName, marketRating+1)
 		hits--
 		fmt.Println(marketName, "increased")
@@ -189,12 +193,10 @@ func (s *Syndicate) publicityTest() {
 	degradeRound = degradeRound - hitsP
 	fmt.Println(degradeRound, "WILL DEGRADE")
 	for marketName, marketRating := range s.Market {
-		fmt.Println("Try", marketName)
 		if degradeRound < 1 {
 			break
 		}
 		if marketRating < 1 {
-			fmt.Println("CANNOT DEGRADE!!!!!!!!!!!!!!!")
 			continue
 		}
 		s.SetRating(marketName, marketRating-1)
@@ -203,10 +205,43 @@ func (s *Syndicate) publicityTest() {
 	}
 }
 
-func (s *Syndicate) NaturalCycle() {
+func (s *Syndicate) naturalCycle() {
+	fmt.Println("  ", s.Name, "EffTest")
 	s.efficiencyTest()
+	fmt.Println("  ", s.Name, "PubTest")
 	s.publicityTest()
 	//ChooseTarget For BlackOpsTest
+	target := pickTarget(s, AllSyndicates)
+	market := pickCommonRandomMarket(s.Name, target)
+	fmt.Println("          ", market, "of", target, "CHOSEN by", s.Name)
+
 	//ChooseTarget For Intel
 
+}
+
+func pickTarget(s *Syndicate, AllSyndicates map[string]*Syndicate) (target string) {
+	var targetList []string
+	for key := range AllSyndicates {
+		if key == s.Name {
+			continue
+		}
+		targetList = append(targetList, key)
+	}
+	r := randInt(1, len(targetList))
+	return targetList[r-1]
+}
+
+func pickCommonRandomMarket(source, target string) string {
+	sin1 := AllSyndicates[source]
+	for key, val := range sin1.Market {
+		if val != 0 {
+			sin2 := AllSyndicates[target]
+			val2, ok := sin2.Market[key]
+			if val2 != 0 && ok {
+				fmt.Println(source, key, val, target, key, val2)
+				return key
+			}
+		}
+	}
+	return ""
 }
