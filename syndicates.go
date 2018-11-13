@@ -103,6 +103,45 @@ func (s *Syndicate) SetRating(ratingName string, newRating int) error {
 	return nil
 }
 
+func (s *Syndicate) increaseRating(ratingName string) {
+	found := false
+	if _, ok := s.Market[ratingName]; ok {
+		found = true
+		if s.Market[ratingName] < 10 {
+			s.Market[ratingName] = s.Market[ratingName] + 1
+		}
+	}
+	if _, ok := s.Operation[ratingName]; ok {
+		found = true
+		if s.Market[ratingName] < 10 {
+			s.Market[ratingName] = s.Market[ratingName] + 1
+		}
+	}
+	if !found {
+		s.err = errors.New("Error: unknown parametr '" + ratingName + "'")
+	}
+}
+
+func (s *Syndicate) decreaseRating(ratingName string) {
+	found := false
+	if _, ok := s.Market[ratingName]; ok {
+		found = true
+		if s.Market[ratingName] > 0 {
+			s.Market[ratingName] = s.Market[ratingName] - 1
+		}
+	}
+	if _, ok := s.Operation[ratingName]; ok {
+		found = true
+		if s.Market[ratingName] > 0 {
+			s.Market[ratingName] = s.Market[ratingName] - 1
+		}
+	}
+
+	if !found {
+		s.err = errors.New("Error: unknown parametr '" + ratingName + "'")
+	}
+}
+
 //AdjustedRating -
 func (s *Syndicate) AdjustedRating(ratingName string) (int, error) {
 	rating, ratError := s.Rating(ratingName)
@@ -164,7 +203,7 @@ func (s *Syndicate) FullReport() string {
 }
 
 func (s *Syndicate) efficiencyTest() {
-	efficiency, err := s.Rating("Management")
+	efficiency, err := s.Rating("Fiscal")
 	handleError(err)
 	hits, outcome, _, gl := sr3SimpleTest(efficiency, 4)
 	fmt.Println("eff test:", hits, outcome, gl)
@@ -205,17 +244,55 @@ func (s *Syndicate) publicityTest() {
 	}
 }
 
+func (s *Syndicate) blackOpsTest() {
+	target := pickTarget(s, AllSyndicates)
+	market := pickCommonRandomMarket(s.Name, target)
+	fmt.Println("Plotting Shadowrun against", market, "of", target, "sponsored by", s.Name)
+	blOps, _ := s.Rating("Enforcement")
+	targSecurity, _ := AllSyndicates[target].Rating("Enforcement")
+	hits, outcome, _, gl := sr3SimpleTest(blOps, targSecurity)
+	fmt.Println("Run was a", outcome, gl)
+	if hits == 0 {
+		s.decreaseRating(market)
+		fmt.Println("          ", s.Name, market, "decreased")
+	}
+	if hits > 1 {
+		s.increaseRating(market)
+		fmt.Println("          ", s.Name, market, "increased")
+		AllSyndicates[target].decreaseRating(market)
+		fmt.Println("          ", target, market, "decreased")
+	}
+}
+
+func (s *Syndicate) intelTest() {
+	target := pickTarget(s, AllSyndicates)
+	market := pickCommonRandomMarket(s.Name, target)
+	fmt.Println("Plotting Shadowrun against", market, "of", target, "sponsored by", s.Name)
+	blOps, _ := s.Rating("Intelligence")
+	targSecurity, _ := AllSyndicates[target].Rating("Management")
+	hits, outcome, _, gl := sr3SimpleTest(blOps, targSecurity)
+	fmt.Println("Run was a", outcome, gl)
+	if hits == 0 {
+		s.decreaseRating(market)
+		fmt.Println("          ", s.Name, market, "decreased")
+	}
+	if hits > 1 {
+		s.increaseRating(market)
+		fmt.Println("          ", s.Name, market, "increased")
+		AllSyndicates[target].decreaseRating(market)
+		fmt.Println("          ", target, market, "decreased")
+	}
+}
+
 func (s *Syndicate) naturalCycle() {
 	fmt.Println("  ", s.Name, "EffTest")
 	s.efficiencyTest()
 	fmt.Println("  ", s.Name, "PubTest")
 	s.publicityTest()
 	//ChooseTarget For BlackOpsTest
-	target := pickTarget(s, AllSyndicates)
-	market := pickCommonRandomMarket(s.Name, target)
-	fmt.Println("          ", market, "of", target, "CHOSEN by", s.Name)
-
+	s.blackOpsTest()
 	//ChooseTarget For Intel
+	s.intelTest()
 
 }
 

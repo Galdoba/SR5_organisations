@@ -68,14 +68,16 @@ func main() {
 	AllSyndicates["Yakuza"] = NewSyndicate("Yakuza")
 	AllSyndicates["Triada"] = NewSyndicate("Triada")
 
-	for i := 0; i < 3; i++ {
+	startMafia := AllSyndicates["Mafia"].FullReport()
+
+	for i := 0; i < 50; i++ {
 		fmt.Println(" ")
 		fmt.Println("Cycle", i)
 		for synName, sin := range AllSyndicates {
 			fmt.Println(" Go:", synName)
 			fmt.Println(" -----------")
 			sin.naturalCycle()
-			fmt.Println(sin.FullReport())
+			//fmt.Println(sin.FullReport())
 		}
 	}
 
@@ -83,6 +85,10 @@ func main() {
 		llog.Info("some err")
 
 	}
+	endMafia := AllSyndicates["Mafia"].FullReport()
+
+	fmt.Println(startMafia)
+	fmt.Println(endMafia)
 
 }
 
