@@ -121,4 +121,102 @@ func randInt(min int, max int) int {
 	return min + rand.Intn(max)
 }
 
+func handleError(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+}
 
+func sr5SimpleTest(val0 ...int) (result string, glitch string, hits int) {
+	val := val0
+	dp := 0
+	limit := 999
+	tn := 1
+	for i := range val {
+		if i == 0 {
+			dp = val[i]
+		}
+		if i == 1 {
+			limit = val[i]
+		}
+		if i == 2 {
+			tn = val[i]
+		}
+		if i > 2 {
+
+			break
+		}
+	}
+	var outarray []int
+	for i := dp; i > 0; i-- {
+		dice := randInt(1, 6)
+		outarray = append(outarray, dice)
+	}
+	var ones int
+	for i := range outarray {
+		switch outarray[i] {
+		case 1:
+			ones++
+		case 5:
+			hits++
+		case 6:
+			hits++
+		default:
+		}
+	}
+	if hits > limit {
+		hits = limit
+	}
+	if hits >= tn {
+		result = "SUCCESS!"
+	} else {
+		result = "FAILURE!"
+	}
+	if len(outarray)/2 < ones {
+		glitch = "GLITCH!"
+		if hits == 0 {
+			glitch = "CRITICAL GLITCH!!!"
+		}
+	}
+	return result, glitch, hits
+}
+
+func analyzeSR5SimpleTest(val0 ...int) (totalSuc int, totalGl int, averageHits float64) {
+	var totalHits float64
+	val := val0
+	dp := 0
+	limit := 999
+	tn := 1
+	for i := range val {
+		if i == 0 {
+			dp = val[i]
+		}
+		if i == 1 {
+			limit = val[i]
+		}
+		if i == 2 {
+			tn = val[i]
+		}
+		if i > 2 {
+
+			break
+		}
+	}
+	for i := 0; i < 1000000; i++ {
+
+		result, glitch, hits := sr5SimpleTest(dp, limit, tn)
+		if result == "SUCCESS!" {
+			totalSuc++
+		}
+		if glitch != "" {
+			totalGl++
+		}
+		totalHits = totalHits + float64(hits)
+
+	}
+	totalSuc = totalSuc / 10000
+	averageHits = totalHits / 1000000
+	fmt.Println("Test:", strconv.Itoa(dp)+"["+strconv.Itoa(limit)+"] ("+strconv.Itoa(tn)+")")
+	fmt.Println("RESULT:", "totalSuc =", totalSuc, "   |||   Hits(average) =", averageHits)
+	return totalSuc, totalGl, averageHits
+}
