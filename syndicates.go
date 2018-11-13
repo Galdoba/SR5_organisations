@@ -58,7 +58,7 @@ func NewSyndicate(name string) *Syndicate {
 	s.Market = make(map[string]int)
 	markets := allMarkets()
 	for i := range markets {
-		s.Market[markets[i]] = randInt(1, 10)
+		s.Market[markets[i]] = randInt(0, 10)
 	}
 	s.Operation = make(map[string]int)
 	operations := allOperations()
@@ -70,24 +70,23 @@ func NewSyndicate(name string) *Syndicate {
 }
 
 //Rating - Возвращает числовое значение рейтинга по имени
-func (s *Syndicate) Rating(ratingName string) (int, error) {
-	rating := -9999
+func (s *Syndicate) Rating(ratingName string) int {
 	if val, ok := s.Market[ratingName]; ok {
-		rating = val
+		return val
 	}
 	if val, ok := s.Operation[ratingName]; ok {
-		rating = val
+		return val
 	}
-
-	llog.Error(rating < -9000, "Error: unknown parameter '"+ratingName+"'")
-	// if rating < -9000 {
-	// 	return rating, errors.New("Error: unknown parameter '" + ratingName + "'")
-	// }
-	return rating, nil
+	s.err = errors.New("Error: unknown parametr '" + ratingName + "'")
+	//llog.Error(rating < -9000, "Error: unknown parameter '"+ratingName+"'")
+	return -1
 }
 
 //SetRating - Изменяет числовое значение рейтинга по имени
-func (s *Syndicate) SetRating(ratingName string, newRating int) error {
+func (s *Syndicate) SetRating(ratingName string, newRating int) {
+	if s.err != nil {
+		return
+	}
 	found := false
 	if _, ok := s.Market[ratingName]; ok {
 		found = true
@@ -98,9 +97,8 @@ func (s *Syndicate) SetRating(ratingName string, newRating int) error {
 		s.Market[ratingName] = newRating
 	}
 	if !found {
-		return errors.New("Error: unknown parametr '" + ratingName + "'")
+		s.err = errors.New("Error: unknown parametr '" + ratingName + "'")
 	}
-	return nil
 }
 
 func (s *Syndicate) increaseRating(ratingName string) {
@@ -119,7 +117,9 @@ func (s *Syndicate) increaseRating(ratingName string) {
 	}
 	if !found {
 		s.err = errors.New("Error: unknown parametr '" + ratingName + "'")
+		return
 	}
+	fmt.Println(s.Name, ratingName, "increased...")
 }
 
 func (s *Syndicate) decreaseRating(ratingName string) {
@@ -136,36 +136,11 @@ func (s *Syndicate) decreaseRating(ratingName string) {
 			s.Market[ratingName] = s.Market[ratingName] - 1
 		}
 	}
-
 	if !found {
 		s.err = errors.New("Error: unknown parametr '" + ratingName + "'")
+		return
 	}
-}
-
-//AdjustedRating -
-func (s *Syndicate) AdjustedRating(ratingName string) (int, error) {
-	rating, ratError := s.Rating(ratingName)
-	if ratError != nil {
-		return -9999, ratError
-	}
-	if adj, ok := s.Adjustment[ratingName]; ok {
-		rating = rating + adj
-	}
-	return rating, nil
-}
-
-func (s *Syndicate) reportRating(ratingName string) (string, error) {
-	report := ""
-	if val, ok := s.Market[ratingName]; ok {
-		report = ratingName + ": " + strconv.Itoa(val)
-	}
-	if val, ok := s.Operation[ratingName]; ok {
-		report = ratingName + ": " + strconv.Itoa(val)
-	}
-	if report == "" {
-		return report, errors.New("Error: unknown parametr '" + ratingName + "'")
-	}
-	return report, nil
+	fmt.Println(s.Name, ratingName, "decreased...")
 }
 
 //FullReport - Возвращает форматированную стену текста с описанием всех характеристик.
@@ -176,12 +151,10 @@ func (s *Syndicate) FullReport() string {
 
 	markets := allMarkets()
 	for i := range markets {
-		marketRep, err := s.reportRating(markets[i])
-		if err != nil {
-			fmt.Println(err)
-		}
-		report = report + marketRep + "\n"
-		marketRating, _ := s.Rating(markets[i])
+		marketRep := s.Rating(markets[i])
+
+		report = report + markets[i] + ": " + strconv.Itoa(marketRep) + "\n"
+		marketRating := s.Rating(markets[i])
 		netRating = netRating + marketRating
 	}
 	report = report + "--------------------" + "\n"
@@ -189,12 +162,10 @@ func (s *Syndicate) FullReport() string {
 
 	operations := allOperations()
 	for i := range operations {
-		operationsRep, err := s.reportRating(operations[i])
-		if err != nil {
-			fmt.Println(err)
-		}
-		report = report + operationsRep + "\n"
-		operationsRating, _ := s.Rating(operations[i])
+		operationsRep := s.Rating(operations[i])
+
+		report = report + operations[i] + ": " + strconv.Itoa(operationsRep) + "\n"
+		operationsRating := s.Rating(operations[i])
 		netRating = netRating + operationsRating
 	}
 	report = report + "--------------------" + "\n"
@@ -203,34 +174,29 @@ func (s *Syndicate) FullReport() string {
 }
 
 func (s *Syndicate) efficiencyTest() {
-	efficiency, err := s.Rating("Fiscal")
-	handleError(err)
-	hits, outcome, _, gl := sr3SimpleTest(efficiency, 4)
-	fmt.Println("eff test:", hits, outcome, gl)
-	fmt.Println("WILL INCREASE", hits, "ASSETS")
+
+	fmt.Println("Run " + s.Name + " Efficiency test:")
+	efficiency := s.Rating("Fiscal")
+	hits, _, _, _ := sr3SimpleTest(efficiency, 4)
 	for marketName, marketRating := range s.Market {
 		if hits < 1 {
 			continue
 		}
 		if marketRating > 9 {
-			fmt.Println("                      CAN'T INCREACE BEOYND 10", marketName)
 			continue
 		}
-		s.SetRating(marketName, marketRating+1)
+		s.increaseRating(marketName)
 		hits--
-		fmt.Println(marketName, "increased")
 	}
+	fmt.Println("")
 }
 
 func (s *Syndicate) publicityTest() {
-	publicity, err := s.Rating("Reputation")
-	handleError(err)
-	hitsP, outcome, _, gl := sr3SimpleTest(publicity, 8)
-	fmt.Println("Pub test:", hitsP, outcome, gl)
-	fmt.Println("WILL SAVE", hitsP, "ASSETS")
+	fmt.Println("Run " + s.Name + " Publicity test:")
+	publicity := s.Rating("Reputation")
+	hitsP, _, _, _ := sr3SimpleTest(publicity, 8)
 	degradeRound := 3
 	degradeRound = degradeRound - hitsP
-	fmt.Println(degradeRound, "WILL DEGRADE")
 	for marketName, marketRating := range s.Market {
 		if degradeRound < 1 {
 			break
@@ -238,62 +204,53 @@ func (s *Syndicate) publicityTest() {
 		if marketRating < 1 {
 			continue
 		}
-		s.SetRating(marketName, marketRating-1)
+		s.decreaseRating(marketName)
 		degradeRound--
-		fmt.Println(marketName, "Degraded")
 	}
+	fmt.Println("")
 }
 
 func (s *Syndicate) blackOpsTest() {
 	target := pickTarget(s, AllSyndicates)
 	market := pickCommonRandomMarket(s.Name, target)
-	fmt.Println("Plotting Shadowrun against", market, "of", target, "sponsored by", s.Name)
-	blOps, _ := s.Rating("Enforcement")
-	targSecurity, _ := AllSyndicates[target].Rating("Enforcement")
+	fmt.Println(s.Name+" plotting Shadowrun against", market, "of", target)
+	blOps := s.Rating("Enforcement")
+	targSecurity := AllSyndicates[target].Rating("Enforcement")
 	hits, outcome, _, gl := sr3SimpleTest(blOps, targSecurity)
 	fmt.Println("Run was a", outcome, gl)
 	if hits == 0 {
 		s.decreaseRating(market)
-		fmt.Println("          ", s.Name, market, "decreased")
 	}
 	if hits > 1 {
 		s.increaseRating(market)
-		fmt.Println("          ", s.Name, market, "increased")
 		AllSyndicates[target].decreaseRating(market)
-		fmt.Println("          ", target, market, "decreased")
 	}
+	fmt.Println("")
 }
 
 func (s *Syndicate) intelTest() {
 	target := pickTarget(s, AllSyndicates)
 	market := pickCommonRandomMarket(s.Name, target)
-	fmt.Println("Plotting Shadowrun against", market, "of", target, "sponsored by", s.Name)
-	blOps, _ := s.Rating("Intelligence")
-	targSecurity, _ := AllSyndicates[target].Rating("Management")
-	hits, outcome, _, gl := sr3SimpleTest(blOps, targSecurity)
+	fmt.Println(s.Name+" plotting Shadowrun against", market, "of", target)
+	intel := s.Rating("Intelligence")
+	targManagement := AllSyndicates[target].Rating("Management")
+	hits, outcome, _, gl := sr3SimpleTest(intel, targManagement)
 	fmt.Println("Run was a", outcome, gl)
 	if hits == 0 {
 		s.decreaseRating(market)
-		fmt.Println("          ", s.Name, market, "decreased")
 	}
 	if hits > 1 {
 		s.increaseRating(market)
-		fmt.Println("          ", s.Name, market, "increased")
 		AllSyndicates[target].decreaseRating(market)
-		fmt.Println("          ", target, market, "decreased")
 	}
+	fmt.Println("")
 }
 
 func (s *Syndicate) naturalCycle() {
-	fmt.Println("  ", s.Name, "EffTest")
 	s.efficiencyTest()
-	fmt.Println("  ", s.Name, "PubTest")
 	s.publicityTest()
-	//ChooseTarget For BlackOpsTest
 	s.blackOpsTest()
-	//ChooseTarget For Intel
 	s.intelTest()
-
 }
 
 func pickTarget(s *Syndicate, AllSyndicates map[string]*Syndicate) (target string) {
@@ -315,7 +272,6 @@ func pickCommonRandomMarket(source, target string) string {
 			sin2 := AllSyndicates[target]
 			val2, ok := sin2.Market[key]
 			if val2 != 0 && ok {
-				fmt.Println(source, key, val, target, key, val2)
 				return key
 			}
 		}

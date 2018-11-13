@@ -1,12 +1,10 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"time"
 
-	ansi "github.com/k0kubun/go-ansi"
 	"github.com/macroblock/imed/pkg/zlog/loglevel"
 	"github.com/macroblock/imed/pkg/zlog/zlog"
 	"github.com/macroblock/imed/pkg/zlog/zlogger"
@@ -29,38 +27,33 @@ func main() {
 	// )
 
 	llog.Add(
-		zlogger.Build().
-			Writer(ansi.NewAnsiStdout()).
-			Styler(zlogger.AnsiStyler).
-			Format(zlogger.DefaultFormat).
-			LevelFilter(loglevel.Debug.OrLower()).
-			Done(),
+		// zlogger.Build().
+		// 	Writer(ansi.NewAnsiStdout()).
+		// 	Styler(zlogger.AnsiStyler).
+		// 	Format(zlogger.DefaultFormat).
+		// 	LevelFilter(loglevel.Debug.OrLower()).
+		// 	Done(),
 		zlogger.Build(). //функциональная команда (начало строителя для логера)
 					Writer(&wr).                        //Что выводит и куда
 					LevelFilter(loglevel.Error.Only()). //условия вывода
 					Format("||||||||||||~l~s~x~m~e\n").
 					Done(), //функциональная команда (конец для Build())
+		zlogger.Build(). //функциональная команда (начало строителя для логера)
+					Writer(&wr).                       //Что выводит и куда
+					LevelFilter(loglevel.Info.Only()). //условия вывода
+					Format("~x\n").
+					Done(), //функциональная команда (конец для Build())
 	)
-	r := randInt(1, 5)
-	fmt.Println(r)
-	llog.Error(r > 0, "r > 2 str")
-	err := errors.New("потому что")
-	//err = nil
-	llog.Warning(err, "где ")
+	// r := randInt(1, 5)
+	// fmt.Println(r)
+	// llog.Error(r > 0, "r > 2 str")
+	// err := errors.New("потому что")
+	// //err = nil
+	// llog.Warning(err, "где ")
 
 	seed := int64(time.Now().UnixNano())
 	rand.Seed(seed)
 	fmt.Println(sr3SimpleTest(1, 10))
-
-	//eff = 6 pub = 8 BO = 6 int = 6
-	fmt.Println("Effic")
-	fmt.Println(sr3SimpleTest(6, 4))
-	fmt.Println("Publ")
-	fmt.Println(sr3SimpleTest(8, 8))
-	fmt.Println("Black Ops")
-	fmt.Println(sr3SimpleTest(6, 7))
-	fmt.Println("Intel")
-	fmt.Println(sr3SimpleTest(6, 5))
 
 	AllSyndicates = make(map[string]*Syndicate)
 
@@ -68,13 +61,11 @@ func main() {
 	AllSyndicates["Yakuza"] = NewSyndicate("Yakuza")
 	AllSyndicates["Triada"] = NewSyndicate("Triada")
 
-	startMafia := AllSyndicates["Mafia"].FullReport()
-
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 10; i++ {
 		fmt.Println(" ")
-		fmt.Println("Cycle", i)
+		fmt.Println("Cycle", i+1)
 		for synName, sin := range AllSyndicates {
-			fmt.Println(" Go:", synName)
+			fmt.Println(synName + ":")
 			fmt.Println(" -----------")
 			sin.naturalCycle()
 			//fmt.Println(sin.FullReport())
@@ -85,16 +76,12 @@ func main() {
 		llog.Info("some err")
 
 	}
-	endMafia := AllSyndicates["Mafia"].FullReport()
-
-	fmt.Println(startMafia)
-	fmt.Println(endMafia)
 
 }
 
 type cType struct{}
 
 func (s *cType) Write(p []byte) (n int, err error) {
-	fmt.Println("Custom:", string(p))
+	fmt.Print(string(p))
 	return len(p), nil
 }
