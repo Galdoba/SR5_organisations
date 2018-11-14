@@ -12,8 +12,8 @@ import (
 
 var llog = zlog.Instance("main")
 
-//AllSyndicates - сборник всех синдикатов(временно)
-var AllSyndicates = make(map[string]*Syndicate)
+//AllOrganizations - сборник всех синдикатов(временно)
+var AllOrganizations = make(map[string]*Organization)
 
 func main() {
 	wr := cType{}
@@ -55,20 +55,23 @@ func main() {
 	rand.Seed(seed)
 	fmt.Println(sr3SimpleTest(1, 10))
 
-	AllSyndicates = make(map[string]*Syndicate)
+	AllOrganizations = make(map[string]*Organization)
 
-	AllSyndicates["Mafia"] = NewSyndicate("Mafia")
-	AllSyndicates["Yakuza"] = NewSyndicate("Yakuza")
-	AllSyndicates["Triada"] = NewSyndicate("Triada")
+	AllOrganizations["Mafia"] = NewOrganization("Mafia", "Syndicate")
+	AllOrganizations["Yakuza"] = NewOrganization("Yakuza", "Syndicate")
+	AllOrganizations["Ares"] = NewOrganization("Ares", "Corporation")
+	AllOrganizations["Renraku"] = NewOrganization("Renraku", "Corporation")
+	AllOrganizations["Haloweeners"] = NewOrganization("Haloweeners", "Gang")
+	AllOrganizations["Killers"] = NewOrganization("Killers", "Gang")
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 20; i++ {
 		fmt.Println(" ")
 		fmt.Println("Cycle", i+1)
-		for synName, sin := range AllSyndicates {
+		for synName, sin := range AllOrganizations {
 			fmt.Println(synName + ":")
 			fmt.Println(" -----------")
 			sin.naturalCycle()
-			//fmt.Println(sin.FullReport())
+			fmt.Println(sin.FullReport())
 		}
 	}
 

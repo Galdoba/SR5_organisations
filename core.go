@@ -221,3 +221,11 @@ func analyzeSR5SimpleTest(val0 ...int) (totalSuc int, totalGl int, averageHits f
 	fmt.Println("RESULT:", "totalSuc =", totalSuc, "   |||   Hits(average) =", averageHits)
 	return totalSuc, totalGl, averageHits
 }
+
+func shuffleStringSlice(slice []string) []string {
+	for i := range slice {
+		j := rand.Intn(i + 1)
+		slice[i], slice[j] = slice[j], slice[i]
+	}
+	return slice
+}
