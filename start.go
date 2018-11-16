@@ -64,7 +64,7 @@ func main() {
 	AllOrganizations["Haloweeners"] = NewOrganization("Haloweeners", "Gang")
 	AllOrganizations["Killers"] = NewOrganization("Killers", "Gang")
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 1; i++ {
 		fmt.Println(" ")
 		fmt.Println("Cycle", i+1)
 		for synName, sin := range AllOrganizations {
@@ -87,4 +87,54 @@ type cType struct{}
 func (s *cType) Write(p []byte) (n int, err error) {
 	fmt.Print(string(p))
 	return len(p), nil
+}
+
+func bonusList() []string {
+	bonuses := []string{
+		"Mr. Johnson reveal Sponsor before contract is made",
+		"Mr. Johnson reveal his target origin before contract is made",
+		"Mr. Johnson provide full info on security of the target (Physical)",
+		"Mr. Johnson provide full info on security of the target (Magic)",
+		"Mr. Johnson provide full info on security of the target (Matrix)",
+		"Mr. Johnson provide Magic Support",
+		"Mr. Johnson provide Matrix Support",
+		"Mr. Johnson provide Logistical Support (can buy stuff for the run with +6 avalability bonus)",
+		"Mr. Johnson can provide Distraction",
+		"Mr. Johnson give Contact after end of the run",
+		"This is light hearted run (+1 karma reward)",
+		"This is light hearted run (+1 karma reward)",
+		"This is light hearted run (+1 karma reward)",
+		"This Run has no restrictions on collateral damage",
+		"This Run has no time restrictions",
+		"Third party have benefit from runners success",
+		"Mr. Johnson willing to pay a bonus for a successful job (payment multiplier +0.2)",
+		"Mission present opportunities to get high value loot",
+		"Mission present opportunities to rare gear",
+	}
+	return bonuses
+}
+
+func flawsList() []string {
+	flaws := []string{
+		"Mr. Johnson is unaware of the sponsor",
+		"Mission target is unknown/not real",
+		"Mr. Johnson provide inacurate information",
+		"Mr. Johnson provide inacurate information",
+		"Mr. Johnson provide inacurate information",
+		"Mission takes place in high Background Area",
+		"Mission takes place in high Matrix Noice Area",
+		"Mission takes place in highly remote Area (usual transport is un available)",
+		"Target is on high Alert (not for the runners)",
+		"Mission involves interest of runner's Friend/Contact (reduce loyalty upon success of the mission)",
+		"This is hard hearted run (-1 karma reward)",
+		"This is hard hearted run (-1 karma reward)",
+		"This is hard hearted run (-1 karma reward)",
+		"This Run has high restrictions on collateral damage",
+		"This Run has tight time restrictions",
+		"Third party have benefit from runner's failure",
+		"Mr. Johnson will not be able to pay agreed payment (payment multiplier -0.2)",
+		"Mission present high risk for runner's gear",
+		"Mission present high risk for runner's gear",
+	}
+	return flaws
 }

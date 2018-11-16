@@ -280,6 +280,33 @@ func (s *Organization) blackOpsTest() {
 	market := pickCommonRandomMarket(s.Name, target)
 	fmt.Println(s.Name+" plotting Shadowrun against", market, "of", target)
 	blOps := s.Rating("BlackOps")
+	bonuses, _, _, _ := sr3SimpleTest(s.Rating(market), 5)
+	flaws, _, _, _ := sr3SimpleTest(AllOrganizations[target].Rating(market), 5)
+	var plannedDays float64
+	intelHits, _, _, _ := sr3SimpleTest(s.Rating("Intelligence"), 4)
+	randDays := randInt(0, 21)
+	plannedDays = float64(randDays - intelHits + 1)
+	if plannedDays < 0 {
+		plannedDays = 1.0
+	}
+	var mcGuffinValue float64
+	mcGuffinValue = float64(AllOrganizations[target].Rating(market) * 1000)
+	run := PlotShadowrun(s, AllOrganizations[target], bonuses, flaws, plannedDays, mcGuffinValue)
+	fmt.Println("Shadowrun parameters:")
+	fmt.Println("Mission:", run.plot)
+	fmt.Println("Proposed Payment:", run.payment)
+	fmt.Println("Sponsor:", run.Sponsor.Name)
+	fmt.Println("Optimal mission time:", plannedDays, "days")
+	for i := bonuses; i > 0; i-- {
+		bon := bonusList()
+		r := randInt(1, len(bon)-1)
+		fmt.Println("  " + bon[r])
+	}
+	for i := flaws; i > 0; i-- {
+		flw := flawsList()
+		r := randInt(1, len(flw)-1)
+		fmt.Println("  " + flw[r])
+	}
 	targSecurity := AllOrganizations[target].Rating("Security")
 	hits, outcome, _, gl := sr3SimpleTest(blOps, targSecurity)
 	fmt.Println("Run was a", outcome, gl)
