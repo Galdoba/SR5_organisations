@@ -102,3 +102,73 @@ func paymentMod(edges int, flaws int, complications int) float64 {
 	fmt.Println("Opposition Rating", complications)
 	return payMod
 }
+
+type NPC struct {
+	Name       string
+	Race       string
+	Background string
+	Awakened   string
+}
+
+func NewNPC(name string) *NPC {
+	npc := NPC{}
+	npc.Name = name
+	npc.Awakened = checkAwaken()
+	npc.Race = randomRace(roll1D100())
+	fmt.Println(npc)
+	return &npc
+}
+
+func randomRace(seed int) string {
+	if seed < 40 {
+		return "Human"
+	}
+	if seed < 62 {
+		return "Orc"
+	}
+	if seed < 77 {
+		return "Elf"
+	}
+	if seed < 91 {
+		return "Dwarf"
+	}
+	if seed < 96 {
+		return "Troll"
+	}
+	return "Other"
+}
+
+func checkAwaken() string {
+	seed := randInt(1, 1000)
+	if seed <= 8 {
+		return "Magician"
+	}
+	if seed <= 10 {
+		return "Mystic Adept"
+	}
+	if seed <= 18 {
+		return "Aspected: Conjurer"
+	}
+	if seed <= 26 {
+		return "Adept"
+	}
+	if seed <= 34 {
+		return "Aspected: Spellcaster"
+	}
+	if seed <= 38 {
+		return "Aspected: Apprentice"
+	}
+	if seed <= 42 {
+		return "Aspected: Encanter"
+	}
+	if seed <= 46 {
+		return "Aspected: Explorer"
+	}
+	if seed <= 62 {
+		return "Aware"
+	}
+	if seed <= 142 {
+		return "Spark/Latent"
+	}
+	return "Mundane"
+}

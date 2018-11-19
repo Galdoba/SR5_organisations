@@ -48,6 +48,10 @@ func roll1D6() int {
 	return randInt(1, 6)
 }
 
+func roll1D100() int {
+	return randInt(1, 100)
+}
+
 func rollSR3dice() int {
 	result := 0
 	explode := true
@@ -57,6 +61,18 @@ func rollSR3dice() int {
 		if r != 6 {
 			explode = false
 		}
+	}
+	return result
+}
+
+func SumXd6(x int) int {
+	result := 0
+	if x < 1 {
+		return 0
+	}
+	for i := 0; i < x ; i++ {
+		r := roll1D6()
+		result = result + r
 	}
 	return result
 }

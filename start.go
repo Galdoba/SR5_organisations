@@ -55,29 +55,32 @@ func main() {
 	rand.Seed(seed)
 	fmt.Println(sr3SimpleTest(1, 10))
 
-	AllOrganizations = make(map[string]*Organization)
+	// AllOrganizations = make(map[string]*Organization)
 
-	AllOrganizations["Mafia"] = NewOrganization("Mafia", "Syndicate")
-	AllOrganizations["Yakuza"] = NewOrganization("Yakuza", "Syndicate")
-	AllOrganizations["Ares"] = NewOrganization("Ares", "Corporation")
-	AllOrganizations["Renraku"] = NewOrganization("Renraku", "Corporation")
-	AllOrganizations["Haloweeners"] = NewOrganization("Haloweeners", "Gang")
-	AllOrganizations["Killers"] = NewOrganization("Killers", "Gang")
+	// AllOrganizations["Mafia"] = NewOrganization("Mafia", "Syndicate")
+	// AllOrganizations["Yakuza"] = NewOrganization("Yakuza", "Syndicate")
+	// AllOrganizations["Ares"] = NewOrganization("Ares", "Corporation")
+	// AllOrganizations["Renraku"] = NewOrganization("Renraku", "Corporation")
+	// AllOrganizations["Haloweeners"] = NewOrganization("Haloweeners", "Gang")
+	// AllOrganizations["Killers"] = NewOrganization("Killers", "Gang")
 
-	for i := 0; i < 1; i++ {
-		fmt.Println(" ")
-		fmt.Println("Cycle", i+1)
-		for synName, sin := range AllOrganizations {
-			fmt.Println(synName + ":")
-			fmt.Println(" -----------")
-			sin.naturalCycle()
-			fmt.Println(sin.FullReport())
-		}
-	}
+	// for i := 0; i < 1; i++ {
+	// 	fmt.Println(" ")
+	// 	fmt.Println("Cycle", i+1)
+	// 	for synName, sin := range AllOrganizations {
+	// 		fmt.Println(synName + ":")
+	// 		fmt.Println(" -----------")
+	// 		sin.naturalCycle()
+	// 		fmt.Println(sin.FullReport())
+	// 	}
+	// }
 
 	if llog.State()&loglevel.Error.Only() != 0 {
 		llog.Info("some err")
 
+	}
+	for i := 0; i < 20; i++ {
+		NewNPC("Test: Name")
 	}
 
 }
