@@ -104,10 +104,13 @@ func paymentMod(edges int, flaws int, complications int) float64 {
 }
 
 type NPC struct {
-	Name       string
-	Race       string
-	Background string
-	Awakened   string
+	Name     string
+	Race     string
+	Racism   Predjudgement
+	Awakened string
+}
+type Predjudgement struct {
+	pRating map[string]int
 }
 
 func NewNPC(name string) *NPC {
@@ -115,6 +118,7 @@ func NewNPC(name string) *NPC {
 	npc.Name = name
 	npc.Awakened = checkAwaken()
 	npc.Race = randomRace(roll1D100())
+	npc.Racism = predjudge(randInt(1, 6))
 	fmt.Println(npc)
 	return &npc
 }
@@ -171,4 +175,97 @@ func checkAwaken() string {
 		return "Spark/Latent"
 	}
 	return "Mundane"
+}
+
+func predjudge(seed int) Predjudgement {
+	prJdj := Predjudgement{}
+	prJdj.pRating = make(map[string]int)
+	if seed != 1 {
+		prJdj.pRating["None"] = 0
+		return prJdj
+	}
+	_, _, rollRes, _ := sr3SimpleTest(1, 1)
+	biasPoint := rollRes[0]
+	if biasPoint > 6 {
+		biasPoint = biasPoint / 2
+	}
+	fmt.Println(biasPoint)
+	for i := 0; i < biasPoint; i++ {
+		bias := biasTowards(SumXd6(2))
+		fmt.Println(bias)
+		prJdj.pRating[bias] = 1
+		// for k, _ := range prJdj.pRating {
+		// 	if k == bias {
+		// 		prJdj.pRating[k] = prJdj.pRating[k] + 1
+		// 	} else {
+		// 		prJdj.pRating[bias] = 1
+		// 	}
+		// }
+	}
+	return prJdj
+}
+
+func biasTowards(seed int) string {
+	if seed == 2 {
+		return "Women (misogyny)"
+	}
+	if seed == 3 {
+		other := []string{
+			"Younger",
+			"Older",
+			"Overweight",
+			"Cyber/Bio/Gene-ware",
+			"Changelings",
+			"Men",
+			"Mundane",
+		}
+		return other[randInt(0, 6)]
+	}
+	if seed == 4 {
+		return "Trogs"
+	}
+	if seed == 5 {
+		return "Women (misogyny)"
+	}
+	if seed == 6 {
+		return "Ethnicity/Culture/Class/Religion"
+	}
+	if seed == 7 {
+		other := []string{
+			"Humans",
+			"Elves",
+			"Dwarfs",
+			"Orks",
+			"Trolls",
+			"Changelings",
+		}
+		return other[randInt(0, 5)]
+	}
+	if seed == 8 {
+		return "Awakned"
+	}
+	if seed == 9 {
+		return "Homosexuals"
+	}
+	if seed == 10 {
+		return "All other Metatypes"
+	}
+	if seed == 11 {
+		other := []string{
+			"Younger",
+			"Older",
+			"Overweight",
+			"Cyber/Bio/Gene-ware",
+			"Changelings",
+			"Men",
+			"Mundane",
+		}
+		return other[randInt(0, 6)]
+	}
+	if seed == 12 {
+		return "Homosexuals"
+	}
+
+	return "Error"
+
 }
