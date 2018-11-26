@@ -106,6 +106,7 @@ func paymentMod(edges int, flaws int, complications int) float64 {
 type NPC struct {
 	Name     string
 	Race     string
+	Gender   string
 	Racism   Predjudgement
 	Awakened string
 }
@@ -116,11 +117,19 @@ type Predjudgement struct {
 func NewNPC(name string) *NPC {
 	npc := NPC{}
 	npc.Name = name
+	npc.Gender = randomGender(randInt(1, 2))
 	npc.Awakened = checkAwaken()
 	npc.Race = randomRace(roll1D100())
 	npc.Racism = predjudge(randInt(1, 6))
 	fmt.Println(npc)
 	return &npc
+}
+
+func randomGender(seed int) string {
+	if seed == 1 {
+		return "Male"
+	}
+	return "Female"
 }
 
 func randomRace(seed int) string {
@@ -193,21 +202,18 @@ func predjudge(seed int) Predjudgement {
 	for i := 0; i < biasPoint; i++ {
 		bias := biasTowards(SumXd6(2))
 		fmt.Println(bias)
-		prJdj.pRating[bias] = 1
-		// for k, _ := range prJdj.pRating {
-		// 	if k == bias {
-		// 		prJdj.pRating[k] = prJdj.pRating[k] + 1
-		// 	} else {
-		// 		prJdj.pRating[bias] = 1
-		// 	}
-		// }
+		if prJdj.pRating[bias] > 0 {
+			prJdj.pRating[bias] = prJdj.pRating[bias] + 1
+		} else {
+			prJdj.pRating[bias] = 1
+		}
 	}
 	return prJdj
 }
 
 func biasTowards(seed int) string {
 	if seed == 2 {
-		return "Women (misogyny)"
+		return "Opposite Gender"
 	}
 	if seed == 3 {
 		other := []string{
@@ -225,7 +231,7 @@ func biasTowards(seed int) string {
 		return "Trogs"
 	}
 	if seed == 5 {
-		return "Women (misogyny)"
+		return "Opposite Gender"
 	}
 	if seed == 6 {
 		return "Ethnicity/Culture/Class/Religion"

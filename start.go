@@ -17,6 +17,7 @@ var AllOrganizations = make(map[string]*Organization)
 
 func main() {
 	wr := cType{}
+
 	// newLogger := misc.NewSimpleLogger
 	// if misc.IsTerminal() {
 	// 	newLogger = misc.NewAnsiLogger
