@@ -80,8 +80,12 @@ func main() {
 		llog.Info("some err")
 
 	}
-	for i := 0; i < 20; i++ {
-		NewNPC("Test: Name")
+	fl := InputFloat64("float1 =")
+	fl2 := fl + 0.5
+	fmt.Println(fl, fl2)
+	for i := 0; i < 1; i++ {
+		npc := NewNPC(InputString("Enter NPC Name: "))
+		fmt.Println(npc)
 	}
 
 }

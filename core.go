@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math"
 	"math/rand"
@@ -46,17 +47,35 @@ func InputInt(descr ...string) int {
 
 //InputFloat64 - takes Float64 from User
 func InputFloat64(descr ...string) float64 {
-	describe(descr)
-	var dataVal float64
-	fmt.Scan(&dataVal)
+	//describe(descr)
+	//var dataVal float64
+	//fmt.Scan(&dataVal)
+	str := InputString(descr[0])
+	dataVal, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		panic(err)
+	}
 	return dataVal
 }
 
 //InputString - takes Float64 from User
 func InputString(descr ...string) string {
 	describe(descr)
-	var dataVal string
-	fmt.Scan(&dataVal)
+	reader := bufio.NewReader(os.Stdin)
+	dataVal, readErr := reader.ReadString('\n')
+	if readErr != nil {
+		panic(readErr)
+	}
+	bt := []byte(dataVal)
+	if len(bt) > 1 {
+		fmt.Println(bt)
+		bt = bt[:len(bt)-2]
+	}
+	if len(bt) > 0 {
+		dataVal = string(bt)
+	} else {
+		dataVal = ""
+	}
 	return dataVal
 }
 

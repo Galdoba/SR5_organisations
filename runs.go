@@ -121,7 +121,8 @@ func NewNPC(name string) *NPC {
 	npc.Awakened = checkAwaken()
 	npc.Race = randomRace(roll1D100())
 	npc.Racism = predjudge(randInt(1, 6))
-	fmt.Println(npc)
+	//fmt.Println(npc)
+
 	return &npc
 }
 
@@ -198,10 +199,10 @@ func predjudge(seed int) Predjudgement {
 	if biasPoint > 6 {
 		biasPoint = biasPoint / 2
 	}
-	fmt.Println(biasPoint)
+	//fmt.Println(biasPoint)
 	for i := 0; i < biasPoint; i++ {
 		bias := biasTowards(SumXd6(2))
-		fmt.Println(bias)
+		//fmt.Println(bias)
 		if prJdj.pRating[bias] > 0 {
 			prJdj.pRating[bias] = prJdj.pRating[bias] + 1
 		} else {
