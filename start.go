@@ -146,3 +146,71 @@ func flawsList() []string {
 	}
 	return flaws
 }
+
+// package main
+
+// import (
+// 	"fmt"
+// 	"log"
+// 	"time"
+
+// 	"github.com/jroimartin/gocui"
+// )
+
+// var counter int
+// var ticker int
+
+// func main() {
+// 	g, err := gocui.NewGui(gocui.OutputNormal)
+// 	if err != nil {
+// 		log.Panicln(err)
+// 	}
+// 	defer g.Close()
+
+// 	go func() {
+// 		for {
+// 			time.Sleep(1 * time.Second)
+// 			g.Update(layout)
+// 			ticker++
+
+// 		}
+// 	}()
+
+// 	g.SetManagerFunc(layout)
+
+// 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
+// 		log.Panicln(err)
+// 	}
+
+// 	if err := g.SetKeybinding("", rune(113), gocui.ModNone, increaseCounter); err != nil {
+// 		log.Panicln(err)
+// 	}
+
+// 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+// 		log.Panicln(err)
+// 	}
+// }
+
+// func layout(g *gocui.Gui) error {
+// 	maxX, maxY := g.Size()
+// 	v, err := g.SetView("size", maxX/2-7, maxY/2, maxX/2+10, maxY/2+3)
+// 	if err != nil && err != gocui.ErrUnknownView {
+// 		return err
+// 	}
+// 	v.Clear()
+// 	fmt.Fprintf(v, "%d, %d, %d, %d", maxX, maxY, ticker, counter)
+// 	return nil
+// }
+
+// func quit(g *gocui.Gui, v *gocui.View) error {
+// 	return gocui.ErrQuit
+// }
+
+// func increaseCounter(g *gocui.Gui, v *gocui.View) error {
+// 	counter++
+// 	if counter > 50 {
+// 		return gocui.ErrQuit
+// 	}
+
+// 	return nil
+// }
