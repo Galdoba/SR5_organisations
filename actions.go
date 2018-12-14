@@ -17,6 +17,11 @@ func actionIncreaseCounter(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func actionToggleTicker(g *gocui.Gui, v *gocui.View) error {
+	toggleTicker()
+	return nil
+}
+
 func toggleTicker() {
 	if tickerGo {
 		tickerGo = false

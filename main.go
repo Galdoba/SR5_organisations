@@ -11,8 +11,11 @@ import (
 var counter int
 var ticker int
 var tickerGo bool
+var appErr error
+var runStart time.Time
 
 func main() {
+	runStart = time.Now()
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -25,7 +28,11 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", rune(113), gocui.ModNone, actionIncreaseCounter); err != nil {
+	if err := g.SetKeybinding("", rune(113) /*q*/, gocui.ModNone, actionIncreaseCounter); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("", rune(109) /*m*/, gocui.ModNone, actionToggleTicker); err != nil {
 		log.Panicln(err)
 	}
 
@@ -37,7 +44,7 @@ func main() {
 
 	go func() {
 		for {
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(40 * time.Millisecond)
 			g.Update(layout)
 			if tickerGo {
 				ticker = ticker + counter
@@ -89,7 +96,15 @@ func fillPanel(v *gocui.View) {
 	switch v.Title {
 	case "Size":
 		v.Clear()
+		t := time.Now().Format("2006-Jan-02 15:04:05")
+		ts := runStart.Format("2006-Jan-02 15:04:05")
+		fmt.Fprintf(v, "Current Real Time: %s \n", t)
+		fmt.Fprintf(v, "RunStart: %s\n", ts)
+		s := time.Since(runStart).Round(time.Millisecond)
+		pureSeconds := float64(s/time.Millisecond) + 567
+		fmt.Fprintf(v, "Program working: %s\n Sec: %d\n", s, pureSeconds/1000)
 		fmt.Fprintf(v, "%d, %d\n", ticker, counter)
+		fmt.Fprintf(v, "rume 'm' = %d", string(rune(109)))
 		// if tickerGo {
 		// 	fmt.Fprintf(v, "tickerGo is active")
 		// }
