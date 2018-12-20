@@ -13,9 +13,11 @@ var ticker int
 var tickerGo bool
 var appErr error
 var runStart time.Time
+var grid0 *grid
 
 func main() {
 	runStart = time.Now()
+	counter = 1
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -40,11 +42,30 @@ func main() {
 		log.Panicln(err)
 	}
 
-	counter = 1
+	if err := g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone, actionMoveRight); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone, actionMoveLeft); err != nil {
+		log.Panicln(err)
+	}
+
+	gr := NewGrid(9, 7)
+	for y := 0; y < gr.maxY; y++ {
+		for x := 0; x < gr.maxX; x++ {
+			tl := NewTile(1+x, 1+y)
+			id := idForGrid(*gr, x, y)
+
+			gr.tileMap[id] = tl
+		}
+	}
+	gr.tileMap[5].content[4] = "|Test Info |"
+	gr.tileMap[14].content[3] = "|   test2  |"
+	grid0 = gr
 
 	go func() {
 		for {
-			time.Sleep(40 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			g.Update(layout)
 			if tickerGo {
 				ticker = ticker + counter
@@ -86,7 +107,6 @@ func newPanelInfo(g *gocui.Gui, panelName string, pX, pY, pW, pH int) (*gocui.Vi
 	}
 	v.Title = panelName
 	if panelName == "Info" {
-		v.Highlight = true
 
 	}
 	return v, nil
@@ -96,6 +116,7 @@ func fillPanel(v *gocui.View) {
 	switch v.Title {
 	case "Size":
 		v.Clear()
+
 		t := time.Now().Format("2006-Jan-02 15:04:05")
 		ts := runStart.Format("2006-Jan-02 15:04:05")
 		fmt.Fprintf(v, "Current Real Time: %s \n", t)
@@ -113,6 +134,21 @@ func fillPanel(v *gocui.View) {
 		if tickerGo {
 			fmt.Fprintf(v, "tickerGo is active")
 		}
+		fmt.Fprintf(v, drawGrid(*grid0))
 	}
 
 }
+
+/*
+
+0000000       2222222
+0     0       2222222
+0     0-------2222222
+0000000-     -2222222
++++++++-     -3333333
++     +-------3333333
++     +44444443333333
++++++++44444443333333
+	   4444444
+	   4444444
+*/
